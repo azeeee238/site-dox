@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>OSINT // SECTION 14 - CONSOLE CENTRALE</title>
+    <style>
+        body {
+            background-color: #050a05;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 30px;
+        }
+        h1 {
+            border-bottom: 2px solid #ffffff;
+            padding-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+        .direct-box {
+            border: 3px dashed #ffffff;
+            background: rgba(20, 20, 20, 0.8);
+            padding: 30px;
+            margin-top: 30px;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+        }
+        input {
+            background: #000;
+            border: 2px solid #ffffff;
+            color: #ffffff;
+            padding: 12px;
+            width: 70%;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            outline: none;
+        }
+        button {
+            background: #ffffff;
+            border: none;
+            color: #000;
+            padding: 12px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            transition: 0.2s;
+        }
+        button:hover {
+            background: #cccccc;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+        }
+        #terminal-output {
+            margin-top: 20px;
+            background: #000;
+            border: 1px solid #444;
+            padding: 15px;
+            height: 180px;
+            overflow-y: auto;
+            font-size: 14px;
+            color: #00ff66;
+            white-space: pre-wrap;
+        }
+        .back-btn {
+            display: inline-block;
+            margin-top: 30px;
+            border: 1px solid #ffffff;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>// SECTION 14 : TERMINAL D'EXTRACTION DE DONNÉES</h1>
+    
+    <div class="direct-box">
+        <p><strong>[?] ACCÈS AU REGISTRE DE DONNÉES :</strong></p>
+        <p>Entrez l'identifiant ou la cible à interroger dans le système :</p>
+        
+        <input type="text" id="targetInput" placeholder="Ex: pseudo_de_ton_pote...">
+        <button onclick="launchQuery()">Lancer</button>
+        
+        <div id="terminal-output">&gt; Terminal prêt. En attente de saisie...</div>
+    </div>
+
+    <br>
+    <a href="index.html" class="back-btn">&lt;&lt; RETOUR AU QG PRINCIPAL</a>
+
+    <script>
+        async function launchQuery() {
+            var target = document.getElementById("targetInput").value.trim().toLowerCase();
+            var output = document.getElementById("terminal-output");
+            
+            if (target === "") {
+                output.innerHTML = "> [ERREUR] Saisie vide. Entrez une cible valide.\n";
+                return;
+            }
+
+            output.innerHTML = "> Chargement de la base de données et analyse pour : " + target + "...\n";
+            
+            try {
+                // Va chercher ton fichier data.json à côté de ta page
+                let response = await fetch('data.json');
+                let database = await response.json();
+
+                setTimeout(function() {
+                    if (database[target]) {
+                        var d = database[target];
+                        output.innerHTML += "> [!] CIBLE TROUVÉE DANS LE REGISTRE :\n";
+                        output.innerHTML += "----------------------------------------\n";
+                        output.innerHTML += " ID : " + d.id + "\n";
+                        output.innerHTML += " Statut : " + d.statut + "\n";
+                        output.innerHTML += " Info : " + d.info + "\n";
+                        output.innerHTML += "----------------------------------------\n";
+                    } else {
+                        output.innerHTML += "> [X] Aucune correspondance trouvée pour '" + target + "'.\n";
+                    }
+                }, 800);
+
+            } catch (error) {
+                output.innerHTML += "> [ERREUR CRITIQUE] Impossible de charger le fichier data.json.\n";
+            }
+        }
+    </script>
+</body>
+</html>
